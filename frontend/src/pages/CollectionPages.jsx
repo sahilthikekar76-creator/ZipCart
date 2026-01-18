@@ -3,8 +3,19 @@ import { FaFilter } from "react-icons/fa";
 import FilterSidebar from '../components/Products/FilterSidebar';
 import SortOptions from '../components/Products/SortOptions';
 import ProductGrid from '../components/Products/ProductGrid';
+import { useParams, useSearchParams } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchProductsByFilter } from '../redux/slices/productSlice';
 const CollectionPages = () => {
-    const[products,setProducts]=useState([]);
+    const {collection}=useParams();
+    const [searchParams]=useSearchParams();
+    const dispatch=useDispatch();
+    const{products,loading,error}=useSelector((state)=>state.products);
+    const queryParams=Object.fromEntries([...searchParams]);
+    useEffect(()=>{
+      dispatch(fetchProductsByFilter({collection,...queryParams}));  
+    },[dispatch,collection,searchParams]);
+    
     const sidebarRef=useRef(null);
     const[isSideBarOpen,setIsSideBarOpen]=useState(false);
     const toggleSideBar=()=>{
@@ -22,123 +33,6 @@ const CollectionPages = () => {
         }
        
     },[])
-    useEffect(()=>{
-        setTimeout(()=>{
-            const fetchedProducts=[
-               {
-        _id:"1",
-        name:"Stylish Jacket",
-        price:120,
-        images:[
-            {
-                url:"https://picsum.photos/500/500?random=1",
-                altText:"Stylish Jacket"          
-            },
-        ],
-    },
-    {
-        _id:"2",
-        name:"Stylish Jacket",
-        price:120,
-        images:[
-            {
-                url:"https://picsum.photos/500/500?random=2",
-                altText:"Stylish Jacket"          
-            },
-        ],
-    },
-    {
-        _id:"3",
-        name:"Stylish Jacket",
-        price:120,
-        images:[
-            {
-                url:"https://picsum.photos/500/500?random=3",
-                altText:"Stylish Jacket"          
-            },
-        ],
-    },
-    {
-        _id:"4",
-        name:"Stylish Jacket",
-        price:120,
-        images:[
-            {
-                url:"https://picsum.photos/500/500?random=4",
-                altText:"Stylish Jacket"          
-            },
-        ],
-    },
-    {
-        _id:"5",
-        name:"Stylish Jacket",
-        price:120,
-        images:[
-            {
-                url:"https://picsum.photos/500/500?random=5",
-                altText:"Stylish Jacket"          
-            },
-        ],
-    },
-    {
-        _id:"6",
-        name:"Stylish Jacket",
-        price:120,
-        images:[
-            {
-                url:"https://picsum.photos/500/500?random=6",
-                altText:"Stylish Jacket"          
-            },
-        ],
-    },
-    {
-        _id:"7",
-        name:"Stylish Jacket",
-        price:120,
-        images:[
-            {
-                url:"https://picsum.photos/500/500?random=7",
-                altText:"Stylish Jacket"          
-            },
-        ],
-    },
-    {
-        _id:"8",
-        name:"Stylish Jacket",
-        price:120,
-        images:[
-            {
-                url:"https://picsum.photos/500/500?random=8",
-                altText:"Stylish Jacket"          
-            },
-        ],
-    }, 
-    {
-        _id:"10",
-        name:"Stylish Jacket",
-        price:120,
-        images:[
-            {
-                url:"https://picsum.photos/500/500?random=10",
-                altText:"Stylish Jacket"          
-            },
-        ],
-    }, 
-    {
-        _id:"9",
-        name:"Stylish Jacket",
-        price:120,
-        images:[
-            {
-                url:"https://picsum.photos/500/500?random=9",
-                altText:"Stylish Jacket"          
-            },
-        ],
-    }, 
-            ];
-            setProducts(fetchedProducts);
-        },1000)
-    },[])
   return (
     <div className='flex flex-col lg:flex-row'>
         {/*mobile filter buttn */}
@@ -155,7 +49,7 @@ const CollectionPages = () => {
             {/*sort options */}
             <SortOptions/>
             {/*product grid */}
-            <ProductGrid products={products}/>
+            <ProductGrid products={products} loading={loading} error={error}/>
         </div>
     </div>
   )

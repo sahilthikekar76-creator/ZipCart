@@ -1,81 +1,36 @@
 import React, { useEffect, useState } from 'react'
 import {toast} from "sonner";
 import ProductGrid from './ProductGrid';
-const selectedProduct={
-        name:"Stylish Jacket",
-        price:120,
-        originalPrice:150,
-        description:"This is a besty jacklkeyufygi",
-        brand:"efeg",
-        material:"ssfadv",
-        colors:["Red","Black"],
-        images:[
-            {
-                url:"https://picsum.photos/500/500?random=5",
-                altText:"Stylish Jacket"  
-            },
-            {
-                url:"https://picsum.photos/500/500?random=2",
-                altText:"Stylish Jacket"  
-            },
+import { useParams } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchProductDetails, fetchSimilarProducts } from '../../redux/slices/productSlice';
+import { addToCart } from '../../redux/slices/cartSlice';
 
-        ],
-        sizes:["XS","S","M","L","XL"],
-    }
-const similarProducts=[
-    {
-        _id:"1",
-        name:"Stylish Jacket",
-        price:120,
-        images:[
-            {
-                url:"https://picsum.photos/500/500?random=1",
-                altText:"Stylish Jacket"          
-            },
-        ],
-    },
-    {
-        _id:"2",
-        name:"Stylish Jacket",
-        price:120,
-        images:[
-            {
-                url:"https://picsum.photos/500/500?random=2",
-                altText:"Stylish Jacket"          
-            },
-        ],
-    },
-    {
-        _id:"3",
-        name:"Stylish Jacket",
-        price:120,
-        images:[
-            {
-                url:"https://picsum.photos/500/500?random=3",
-                altText:"Stylish Jacket"          
-            },
-        ],
-    },
-    {
-        _id:"4",
-        name:"Stylish Jacket",
-        price:120,
-        images:[
-            {
-                url:"https://picsum.photos/500/500?random=4",
-                altText:"Stylish Jacket"          
-            },
-        ],
-    },
-]
-const ProductDetails = () => {
-    const [mainImage, setMainImage] = useState(
-        selectedProduct.images[0]?.url || ""
-    );
+
+const ProductDetails = ({productId}) => {
+    const {id}=useParams();
+    const dispatch=useDispatch();
+    const{selectedProduct,loading,error,similarProducts}=useSelector((state)=>state.products);
+    const{user,guestId}=useSelector((state)=>state.auth);
+
+    const [mainImage, setMainImage] = useState(null);
     const[selectedSize,setSelectedSize]=useState("");
     const[selectedColor,setSelectedColor]=useState("");
     const[quantity,setQuantity]=useState(0);
     const[isButtonDisabled,setIsButtonDisabled]=useState(false);
+
+    const productFetchId=productId ||id;
+    useEffect(()=>{
+        if(selectedProduct?.images?.length>0){
+            setMainImage(selectedProduct.images[0].url);
+        }
+    },[selectedProduct,mainImage]);
+    useEffect(()=>{
+        if(productFetchId){
+            dispatch(fetchProductDetails(productFetchId));
+            dispatch(fetchSimilarProducts(productFetchId));;
+        }
+    },[dispatch,productFetchId])
     const handleDecrement=()=>{
         setQuantity(prev=>(prev>0?prev-1:0));
     }
@@ -89,16 +44,33 @@ const ProductDetails = () => {
             });
             return;
         }
-        setIsButtonDisabled(true);
-        setTimeout(() => {
-            toast.success("Product added successfully!",{
-                duration:1000
-            });
-            setIsButtonDisabled(false);
-        }, 3000);
+    dispatch(
+        addToCart({
+            productId:productFetchId,
+            quantity,
+            size:selectedSize,
+            color:selectedColor,
+            guestId,
+            userId:user?._id,
+        })
+    ).then(()=>{
+        toast.success("Product added to cart!",{
+            duration:1000,
+        });
+    })
+    .finally(()=>{
+        setIsButtonDisabled(false);
+    })
+};
+    if(loading){
+        return<p className='text-center'>Loading...</p>
+    }
+    if(error){
+        return<p>Error:{error}</p>
     }
   return (
     <div className='p-6'>
+        {selectedProduct && (
       <div className='max-w-6xl mx-auto bg-white p-8 rounded-lg'>
         <div className='flex flex-col md:flex-row'>
             {/*left thumbnails */}
@@ -148,7 +120,7 @@ const ProductDetails = () => {
                             filter:"brightness(0.5)",
                         }}>
                         </button>
-                    ))}cnpm i sooner
+                    ))}
                 </div>
             </div>
             <div className="mb-4">
@@ -205,10 +177,10 @@ const ProductDetails = () => {
             <h2 className='text-2xl text-center font-medium mb-4'>
                 You May Also Like
             </h2>
-            <ProductGrid products={similarProducts}/>
+            <ProductGrid products={similarProducts} loading={loading} error={error}/>
         </div>
 
-      </div>
+      </div>)}
     </div>
   )
 }

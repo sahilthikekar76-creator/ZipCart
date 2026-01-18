@@ -1,22 +1,54 @@
-import React, { useState } from 'react'
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from 'react'
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import register from '../assets/register.webp'
 import { toast } from 'sonner';
+import { registeredUser} from '../redux/slices/authSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { mergeCart } from '../redux/slices/cartSlice';
 const Register = () => {
     const[form,setForm]=useState({username:"",email:"",password:"",confirmPassword:""});
-    
+    const dispatch=useDispatch();
+    const navigate=useNavigate();
+const location=useLocation();
+const{user,guestId}=useSelector((state)=>state.auth);
+const {cart}=useSelector((state)=>state.cart);
+//get redirect parameter and check if its checkout or something
+const redirect=new URLSearchParams(location.search).get("redirect")||"/";
+const isCheckoutRedirect=redirect.includes("checkout");
+useEffect(()=>{
+  if(user){
+    if(cart?.products.length>0 && guestId){
+      dispatch(mergeCart({guestId,user})).then(()=>{
+        navigate(isCheckoutRedirect?"/checkout":"/");
+      })
+    }else{
+      navigate(isCheckoutRedirect?"/checkout":"/");
+    }
+  }
+},[user,guestId,cart,navigate,isCheckoutRedirect,dispatch]);
       const handleChange=(e)=>{
           setForm({...form,[e.target.name]:e.target.value});
       };
-      const handleSubmit=async(e)=>{
-          e.preventDefault();
-          if(form.password !== form.confirmPassword){
-              toast.error("Password should match",{
-                duration:1000,
-            });
-            return;
+      const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        //  Validate password match first
+      if (form.password !== form.confirmPassword) {
+        toast.error("Passwords do not match", { duration: 1000 });
+         return;
       }
-      }
+
+      //  Create payload WITHOUT confirmPassword
+      const payload = {
+        name: form.username, // backend expects `name`
+        email: form.email,
+        password: form.password,
+      };
+
+      //  Correct dispatch
+      dispatch(registeredUser(payload));
+      };
+
       
   return (
     <div className='w-full flex items-center justify-center gap-40 p-8 px-20 md:p-12'>
@@ -47,7 +79,7 @@ const Register = () => {
         <button type="submit" className='w-full bg-black text-white rounded-lg font-semibold p-2 hover:bg-gray-800 transition'>Register</button>
         <p className='mt-6 text-center text-sm'>
           Already register?
-          <Link to="/login" className='text-blue-500'>
+          <Link to={`/login?redirect=${encodeURIComponent(redirect)}`} className='text-blue-500'>
           Login</Link>
         </p>
       </form>

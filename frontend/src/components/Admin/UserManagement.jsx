@@ -1,13 +1,23 @@
-import React, { useState } from 'react'
-const users=[
-        {
-            _id:1434,
-            name:"dwghsj",
-            email:"gvdw",
-            role:"gbef",
-        },
-]
+import React, { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { addUser, deleteUser, fetchUsers, updateUser } from '../../redux/slices/adminSlice';
+
 const UserManagement = () => {
+    const dispatch=useDispatch();
+    const navigate=useNavigate();
+    const {user}=useSelector((state)=>state.auth);
+    const{users,loading,error}=useSelector((state)=>state.admin);
+    useEffect(()=>{
+        if(user && user.role!=="admin"){
+            navigate('/');
+        }
+    },[user,navigate]);
+    useEffect(()=>{
+        if(user && user.role==="admin"){
+            dispatch(fetchUsers());
+        }
+    },[dispatch,user]);
     const[formData,setFormData]=useState({
         name:"",
         email:"",
@@ -22,6 +32,7 @@ const UserManagement = () => {
     }
     const handleSubmit=(e)=>{
         e.preventDefault();
+        dispatch(addUser(formData));
         //reset the form
         setFormData({
             name:"",
@@ -30,9 +41,20 @@ const UserManagement = () => {
             role:"customer",
         })
     }
-    const handleRoleChange=(userId,newRole)=>{};
+    const handleRoleChange=(userId,newRole)=>{
+        dispatch(updateUser({id:userId,role:newRole}));
+    };
     const handleDeleteUser=(userId)=>{
-        if(window.confirm("Are you sure you want to delete this user?"));
+       
+        if(window.confirm("Are you sure you want to delete this user?")){
+         dispatch(deleteUser(userId));
+        }
+    }
+    if(loading){
+        return <p>Loading...</p>
+    }
+    if(error){
+        return <p>Error:{error}</p>
     }
   return (
     <div className='mx-auto max-w-7xl p-6'>
@@ -86,7 +108,7 @@ const UserManagement = () => {
                             </td>
                             <td className="p-4">{user.email}</td>
                             <td className="p-4">
-                                <select value={user.role} onChange={(e)=>handleRoleChange(user._id,e.target)}
+                                <select value={user.role} onChange={(e)=>handleRoleChange(user._id,e.target.value)}
                                 className='p-2 border rounded '>
                                     <option value="customer" className="">Customer</option>
                                     <option value="admin" className="">Admin</option>

@@ -202,24 +202,6 @@ router.get('/new-arrivals',async(req,res)=>{
     }
 })
 
-
-//GET/api/products/:id
-//get a single product by ID aceess public
-
-router.get('/:id',async(req,res)=>{
-    try{
-        const product=await Product.findById(req.params.id);
-        if(product){
-            res.json(product);
-        }else{
-            res.status(404),json({message:"Product not found"});
-        }
-    }catch(err){
-        console.error(err);
-        res.status(500).send("Server error");
-    }
-})
-
 //GET/api/products/similar/:id
 //similar products based on current products gender and category
 //acess public
@@ -241,6 +223,24 @@ router.get("/similar/:id",async(req,res)=>{
         res.status(500).send("Server error");
     }
 })
+
+//GET/api/products/:id
+//get a single product by ID aceess public
+
+router.get('/:id',async(req,res)=>{
+    try{
+        const product=await Product.findById(req.params.id);
+        if(product){
+            res.json(product);
+        }else{
+            res.status(404).json({message:"Product not found"});
+        }
+    }catch(err){
+        console.error(err);
+        res.status(500).send("Server error");
+    }
+})
+
 
 
 module.exports=router;

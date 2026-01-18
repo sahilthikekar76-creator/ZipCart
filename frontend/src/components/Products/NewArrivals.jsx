@@ -2,11 +2,23 @@ import React, { useEffect, useState } from 'react'
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi'
 import { Link } from 'react-router-dom'
 import { useRef } from "react";
-
+import axios from 'axios';
 const NewArrivals = () => {
     const scrollRef = useRef(null);
     const [canScrollLeft, setCanScrollLeft] = useState(false);
     const [canScrollRight, setCanScrollRight] = useState(true);
+    const [newArrivals,setNewArrivals]=useState([]);
+    useEffect(()=>{
+        const fetchNewArrivals=async()=>{
+            try {
+               const response=await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/products/new-arrivals`) ;
+               setNewArrivals(response.data);
+            } catch (error) {
+                console.error(error);
+            }
+        };
+        fetchNewArrivals();
+    },[]);
     const tolerance = 2;
     const updateScrollButtons = () => {
         const el = scrollRef.current;//scrolling container element
@@ -37,99 +49,9 @@ const NewArrivals = () => {
         In simple words:
             React runs your effect
             Later, React cleans it up to avoid problems*/
-    }, []);
+    }, [newArrivals]);
 
-
-    const NewArrivals=[
-    {
-        _id:"1",
-        name:"Stylish Jacket",
-        price:120,
-        images:[
-            {
-                url:"https://picsum.photos/500/500?random=1",
-                altText:"Stylish Jacket"          
-            },
-        ],
-    },
-    {
-        _id:"2",
-        name:"Stylish Jacket",
-        price:120,
-        images:[
-            {
-                url:"https://picsum.photos/500/500?random=2",
-                altText:"Stylish Jacket"          
-            },
-        ],
-    },
-    {
-        _id:"3",
-        name:"Stylish Jacket",
-        price:120,
-        images:[
-            {
-                url:"https://picsum.photos/500/500?random=3",
-                altText:"Stylish Jacket"          
-            },
-        ],
-    },
-    {
-        _id:"4",
-        name:"Stylish Jacket",
-        price:120,
-        images:[
-            {
-                url:"https://picsum.photos/500/500?random=4",
-                altText:"Stylish Jacket"          
-            },
-        ],
-    },
-    {
-        _id:"5",
-        name:"Stylish Jacket",
-        price:120,
-        images:[
-            {
-                url:"https://picsum.photos/500/500?random=5",
-                altText:"Stylish Jacket"          
-            },
-        ],
-    },
-    {
-        _id:"6",
-        name:"Stylish Jacket",
-        price:120,
-        images:[
-            {
-                url:"https://picsum.photos/500/500?random=6",
-                altText:"Stylish Jacket"          
-            },
-        ],
-    },
-    {
-        _id:"7",
-        name:"Stylish Jacket",
-        price:120,
-        images:[
-            {
-                url:"https://picsum.photos/500/500?random=7",
-                altText:"Stylish Jacket"          
-            },
-        ],
-    },
-    {
-        _id:"8",
-        name:"Stylish Jacket",
-        price:120,
-        images:[
-            {
-                url:"https://picsum.photos/500/500?random=8",
-                altText:"Stylish Jacket"          
-            },
-        ],
-    },
-    ]
+    
     
   return (
     <section className='container mx-auto px-4 mb-10 relative'>
@@ -172,7 +94,7 @@ const NewArrivals = () => {
 
         {/* scrollable content */}
         <div  ref={scrollRef} className='container mx-auto overflow-x-auto scroll-smooth flex space-x-6 relative px-2'>
-        {NewArrivals.map((product)=>(
+        {newArrivals.map((product)=>(
             <div key={product._id} className='min-w-[100%] sm:min-w-[50%] lg:min-w-[30%] relative' >
                 <img src={product.images[0]?.url} alt={product.images[0]?.altText || product.name} className='w-full h-[500px] object-cover rounded '></img>
                 <div className='absolute bottom-0 left-0 right-0 backdrop-blur-md text-white p-4 rounded-b-lg '>

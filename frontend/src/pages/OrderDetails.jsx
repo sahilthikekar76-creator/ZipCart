@@ -1,46 +1,21 @@
 import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router-dom';
+import { fetchUserOrderDetails } from '../redux/slices/orderSlice';
 
 const OrderDetails = () => {
   const { id } = useParams();
-  const [orderDetails, setOrderDetails] = useState(null);
-
-  useEffect(() => {
-    const mockOrderDetails = {
-      _id: id,
-      createdAt: new Date(),
-      isPaid: true,
-      isDelivered: false,
-      paymentMethod: "PayPal",
-      shippingMethod: "Standard",
-      shippingAddress: { city: "efd", country: "rfed" },
-      orderItems: [
-        {
-          productId: 1,
-          name: "T-Shirt",
-          quantity: 1,
-          price: 15,
-          image: "https://picsum.photos/200?random=1",
-        },
-        {
-          productId: 2,
-          name: "Shirt",
-          quantity: 3,
-          price: 25,
-          image: "https://picsum.photos/200?random=2",
-        },
-        {
-          productId: 3,
-          name: "T-Shirt",
-          quantity: 1,
-          price: 15,
-          image: "https://picsum.photos/200?random=3",
-        },
-      ],
-    };
-
-    setOrderDetails(mockOrderDetails);
-  }, [id]);
+  const dispatch=useDispatch();
+  const {orderDetails,loading,error}=useSelector((state)=>state.orders);
+  useEffect(()=>{
+    dispatch(fetchUserOrderDetails(id));
+  },[dispatch,id]);
+ if(loading){
+  return <p>Loading...</p>
+ }
+ if(error){
+  return <p>Error:{error}</p>
+ }
 
   return (
     <div className="mx-auto max-w-7xl p-4 sm:p-6">
@@ -80,7 +55,7 @@ const OrderDetails = () => {
                     : "bg-red-100 text-yellow-700"
                 } px-3 py-1 rounded-full text-sm font-medium mb-2`}
               >
-                {orderDetails.isDeliverd ? "Delivered" : "Pending"}
+                {orderDetails.isDelivered ? "Delivered" : "Pending"}
               </span>
             </div>
           </div>
@@ -121,7 +96,7 @@ const OrderDetails = () => {
                                 <Link to={`/product/${item.productId}`} className='text-blue-500 hover:underline'>{item.name}</Link>
                             </td>
                             <td className="py-2 px-4">${item.price}</td>
-                            <td className="py-2 px-4">${item.quantity}</td>
+                            <td className="py-2 px-4">{item.quantity}</td>
                             <td className="py-2 px-4">${item.price*item.quantity}</td>
                         </tr>
                     ))}
