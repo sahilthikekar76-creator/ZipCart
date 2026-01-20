@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import login from '../assets/login.webp';
+
 import { loginUser } from '../redux/slices/authSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { mergeCart } from '../redux/slices/cartSlice';
@@ -86,7 +86,7 @@ useEffect(()=>{
 
       <div className="hidden md:block w-1/3 bg-gray-800 ">
         <div className="w-full h-full rounded-md">
-          <img src={login} alt="login image" className='h-[550px] w-full object-cover' />
+          <img src="/assets/login.webp" alt="login image" className='h-[550px] w-full object-cover' />
         </div>
       </div>
     </div>

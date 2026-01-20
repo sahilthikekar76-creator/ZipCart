@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import register from '../assets/register.webp'
+
 import { toast } from 'sonner';
 import { registeredUser} from '../redux/slices/authSlice';
 import { useDispatch, useSelector } from 'react-redux';
@@ -86,7 +86,7 @@ useEffect(()=>{
       </form>
       <div className="hidden md:block w-1/3 bg-gray-800 ">
         <div className="w-full h-full rounded-md">
-          <img src={register} alt="login image" className='h-[650px] w-full object-cover'></img>
+          <img  src="/assets/register.webp" alt="register image" className='h-[650px] w-full object-cover'></img>
         </div>
       </div>
     </div>
