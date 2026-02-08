@@ -104,15 +104,15 @@ router.delete('/:id',protect,admin,async(req,res)=>{
 
 router.get('/',async(req,res)=>{
     try{
-        const {collection,size,color,gender,minPrice,maxPrice,
+        const {collections,size,color,gender,minPrice,maxPrice,
             sortBy,search,category,material,brand,limit
         }=req.query;
 
         let query={};
 
         //filter logic
-        if(collection && collection.toLocaleLowerCase()!=="all"){
-            query.collection=collection;
+        if(collections && collections.toLocaleLowerCase()!=="all"){
+            query.collections=collections;
         }
         if(category && category.toLocaleLowerCase()!=="all"){
             query.category=category;
